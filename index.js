@@ -29,6 +29,7 @@ async function run() {
 
 
         const newsCollection = client.db('cityScopeDB').collection('news');
+        const userCollection = client.db('cityScopeDB').collection('users');
 
 
         // news collection 
@@ -42,6 +43,35 @@ async function run() {
             const id = req.params.id
             const query = { _id: new ObjectId(id) };
             const result = await newsCollection.findOne(query)
+            res.send(result)
+        })
+
+
+        // user collection 
+        app.post('/users', async (req, res)=>{
+            const user = req.body;
+            
+            const query = {email :  user.email}
+            const existingUser = await userCollection.findOne(query)
+            if(existingUser){
+                return res.send({message: 'user exists', insertedId: null}) 
+            }
+            const result = await userCollection.insertOne(user);
+            res.send(result)
+        })
+        app.get('/users', async (req, res)=>{
+            
+            const result = await userCollection.find().toArray()
+            res.send(result)
+        })
+
+        app.get('/user', async(req, res)=>{
+            let query ={}
+            if(req.query?.email){
+                query = {email: req.query.email}
+            }
+            const cursor = userCollection.find(query)
+            const result = await cursor.toArray()
             res.send(result)
         })
 
