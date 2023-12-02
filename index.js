@@ -52,6 +52,23 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/search', async (req, res)=>{
+            let query = {}
+            if(req.query?.name){
+                query = {title : {$regex: req.query.name, $options: 'i'}}
+            }
+            const cursor = newsCollection.find(query)
+            const result = await cursor.toArray()
+            res.send(result)
+        })
+        app.get('/filter', async(req, res)=>{
+            const filtertext = req.query.filtertext;
+            const query = {author : { $regex: filtertext, $options: 'i' }};
+            const result =await newsCollection.find(query).toArray()
+            res.send(result)
+            console.log(filtertext);
+        })
+
 
         // user collection 
         app.post('/users', async (req, res)=>{
