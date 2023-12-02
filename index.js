@@ -39,6 +39,12 @@ async function run() {
             res.send(result)
         })
 
+        app.post('/news', async (req, res)=>{
+            const news = req.body;
+            const result = await newsCollection.insertOne(news)
+            res.send(result)
+        })
+
         app.get('/news/:id', async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) };
@@ -82,7 +88,8 @@ async function run() {
                     phone: updateProfile.phone,
                     bath: updateProfile.bath,
                     address: updateProfile.address,
-                    gender: updateProfile.gender
+                    gender: updateProfile.gender,
+                    photoURL: updateProfile.photoURL
                 }
             }
             const result = await userCollection.updateOne(filter, update, options)
