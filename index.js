@@ -100,6 +100,12 @@ async function run() {
             res.send(result)
         })
 
+        app.delete('/mynews/:id', async (req, res)=>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result =await newsCollection.deleteOne(query)
+            res.send(result)
+        })
 
         // user collection 
         app.post('/users', async (req, res)=>{
@@ -151,6 +157,19 @@ async function run() {
             }
             const cursor = userCollection.find(query)
             const result = await cursor.toArray()
+            res.send(result)
+        })
+
+        app.patch('/user/admin/:id', async (req, res)=>{
+            const id = req.params.id;
+            const filter = {_id: new ObjectId(id)};
+            const options = {upsert: true};
+            const update = {
+                $set: {
+                    role: 'admin'
+                }
+            }
+            const result = await userCollection.updateOne(filter,update, options)
             res.send(result)
         })
 
