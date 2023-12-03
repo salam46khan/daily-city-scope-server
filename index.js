@@ -34,7 +34,12 @@ async function run() {
 
         // news collection 
         app.get('/news', async (req, res) => {
-
+            const query = {status: 'pending'}
+            // const query = {isPrimium: true}
+            const result = await newsCollection.find(query).sort({ date: -1 }).toArray()
+            res.send(result)
+        })
+        app.get('/allnews', async (req, res) => {
             const result = await newsCollection.find().sort({ date: -1 }).toArray()
             res.send(result)
         })
@@ -52,6 +57,7 @@ async function run() {
             res.send(result)
         })
 
+
         app.get('/search', async (req, res)=>{
             let query = {}
             if(req.query?.name){
@@ -67,6 +73,31 @@ async function run() {
             const result =await newsCollection.find(query).toArray()
             res.send(result)
             console.log(filtertext);
+        })
+        app.get('/mynews', async(req, res)=>{
+            const authorEmail = req.query.authorEmail;
+            const query = {authorEmail : authorEmail};
+            const result =await newsCollection.find(query).toArray()
+            res.send(result)
+            // console.log(authorEmail);
+        })
+
+        app.put('/news/:id', async (req, res)=>{
+            const id = req.params.id;
+            const updateNews = req.body;
+            const filter = {_id: new ObjectId(id)};
+            const options = {upsert: true};
+            const update = {
+                $set: {
+                    title: updateNews.title,
+                    category: updateNews.category,
+                    location: updateNews.location,
+                    description: updateNews.description,
+                    isPrimium: updateNews.isPrimium
+                }
+            }
+            const result = await newsCollection.updateOne(filter, update, options)
+            res.send(result)
         })
 
 
