@@ -30,6 +30,7 @@ async function run() {
 
         const newsCollection = client.db('cityScopeDB').collection('news');
         const userCollection = client.db('cityScopeDB').collection('users');
+        const publisherCollection = client.db('cityScopeDB').collection('publisher');
 
 
         // news collection 
@@ -132,19 +133,20 @@ async function run() {
             res.send(result)
         })
 
-        app.put('/users/:id', async (req, res)=>{
+        app.patch('/users/:id', async (req, res)=>{
             const id = req.params.id;
             const updateProfile = req.body;
             const filter = {_id: new ObjectId(id)};
             const options = {upsert: true};
             const update = {
-                $set: {
-                    phone: updateProfile.phone,
-                    bath: updateProfile.bath,
-                    address: updateProfile.address,
-                    gender: updateProfile.gender,
-                    photoURL: updateProfile.photoURL
-                }
+                $set: updateProfile
+                // {
+                //     phone: updateProfile?.phone,
+                //     bath: updateProfile?.bath,
+                //     address: updateProfile?.address,
+                //     gender: updateProfile?.gender,
+                //     photoURL: updateProfile?.photoURL
+                // }
             }
             const result = await userCollection.updateOne(filter, update, options)
             res.send(result)
@@ -173,6 +175,16 @@ async function run() {
             res.send(result)
         })
 
+        // publisher api 
+        app.post('/publisher', async (req, res)=>{
+            const publisher = req.body;
+            const result = await publisherCollection.insertOne(publisher)
+            res.send(result)
+        })
+        app.get('/publisher', async (req, res)=>{
+            const result = await publisherCollection.find().toArray()
+            res.send(result)
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
