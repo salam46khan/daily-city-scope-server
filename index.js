@@ -35,13 +35,46 @@ async function run() {
 
         // news collection 
         app.get('/news', async (req, res) => {
-            const query = {status: 'pending'}
+            const query = {status: 'approve'}
             // const query = {isPrimium: true}
             const result = await newsCollection.find(query).sort({ date: -1 }).toArray()
             res.send(result)
         })
         app.get('/allnews', async (req, res) => {
             const result = await newsCollection.find().sort({ date: -1 }).toArray()
+            res.send(result)
+        })
+        app.patch('/allnews/:id', async (req, res) =>{
+            const id = req.params.id;
+            const filter = {_id: new ObjectId(id)};
+            const options = {upsert: true};
+            const update = {
+                $set: {
+                    status: 'approve'
+                }
+            }
+            const result = await newsCollection.updateOne(filter, update, options)
+            res.send(result)
+        })
+        // app.patch('/makepremium/:id', async (req, res) =>{
+        //     const id = req.params.id;
+        //     // const premium = req.body;
+        //     console.log(premium);
+        //     const filter = {_id: new ObjectId(id)};
+        //     const options = {upsert: true};
+        //     const update = {
+        //         $set: {
+        //             isPrimium: true
+        //         }
+        //     }
+        //     const result = await newsCollection.updateOne(filter, update, options)
+        //     res.send(result)
+        // })
+
+        app.delete('/allnews/:id', async (req, res)=>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result =await newsCollection.deleteOne(query)
             res.send(result)
         })
 
@@ -101,7 +134,7 @@ async function run() {
             res.send(result)
         })
 
-        app.delete('/mynews/:id', async (req, res)=>{
+        app.delete('/allnews/:id', async (req, res)=>{
             const id = req.params.id;
             const query = {_id: new ObjectId(id)}
             const result =await newsCollection.deleteOne(query)
